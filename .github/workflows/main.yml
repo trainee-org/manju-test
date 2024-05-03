@@ -1,0 +1,38 @@
+name: Fetch Pull Requests
+
+on:
+  push
+
+jobs:
+  fetch-pull-requests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Fetch Pull Requests
+        run: |
+          PR_DATA=$(curl -s "https://api.github.com/repos/trainee-org/manju-test/pulls" \
+            -H "Authorization: Bearer ${{ secrets.TOKEN }}")
+          echo "PR_Number,PR_Id,State,PR_Title,PR_url" > pr_data.csv  # Headers added here
+          echo "$PR_DATA" | jq -r '.[] | [.number, .id, .state, .title, .html_url] | @csv' >> pr_data.csv
+          
+      - name: Pull changes from remote repository
+        run: |
+          git config --global user.email "manjushrik@devtools.in"
+          git config --global user.name "manjushrikrishna"
+          git pull
+          git status
+          git add .
+          git commit -m "commited from action"
+          
+      - name: Push changes to repository
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          directory: .
