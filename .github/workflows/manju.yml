@@ -1,0 +1,53 @@
+name: Create Pull Request 
+on:
+  push: 
+    branches:
+       - branch_push-test
+       - new_pull
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    # - name: Set up GitHub token
+    #   run: echo "GITHUB_TOKEN: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" >> $GITHUB_ENV
+    - name: Determine target branch and create Pull Request
+      env:
+        GITHUB_TOKEN: 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
+      run: |
+        # Variables
+        GITHUB_API_URL="https://api.github.com"
+        REPO_OWNER="${{ github.repository_owner }}"
+        REPO_NAME="${{ github.event.repository.name }}"
+        SOURCE_BRANCH="${{ github.ref_name }}"
+        if [ "$SOURCE_BRANCH" = "branch_push-test" ]; then
+          TARGET_BRANCH="Dockertest"
+        elif [ "$SOURCE_BRANCH" = "new_pull" ]; then
+          TARGET_BRANCH="main"
+        else
+          echo "No action for branch $SOURCE_BRANCH"
+          exit 0
+        fi
+        PR_TITLE="Automated Pull Request from $SOURCE_BRANCH to $TARGET_BRANCH"
+        PR_BODY="This is an automated pull request created by GitHub Actions."
+        # Create Pull Request using GitHub API
+        response=$(curl -s -X POST -H "Authorization: token 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" \
+          -H "Accept: application/vnd.github.v3+json" \
+          $GITHUB_API_URL/repos/$REPO_OWNER/$REPO_NAME/pulls \
+          -d @- << EOF
+        {
+          "title": "$PR_TITLE",
+          "head": "$SOURCE_BRANCH",
+          "base": "$TARGET_BRANCH",
+          "body": "$PR_BODY"
+        }
+        EOF
+        )
+        # Check if the pull request was created successfully
+        if echo "$response" | grep -q '"url":'; then
+          echo "Pull request created successfully."
+        else
+          echo "Failed to create pull request. Response:"
+          echo "$response"
+        fi
