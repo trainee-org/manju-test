@@ -11,7 +11,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
     # - name: Set up GitHub token
-    #   run: echo "GITHUB_TOKEN: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" >> $GITHUB_ENV
+    #   run: echo "GITHUB_TOKEN: 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" >> $GITHUB_ENV
     - name: Determine target branch and create Pull Request
       env:
         GITHUB_TOKEN: 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
