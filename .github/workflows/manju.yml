@@ -11,10 +11,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
     # - name: Set up GitHub token
-    #   run: echo "GITHUB_TOKEN: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" >> $GITHUB_ENV
+    #   run: echo "GITHUB_TOKEN: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" >> $GITHUB_ENV
     - name: Determine target branch and create Pull Request
       env:
-        GITHUB_TOKEN: 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
+        GITHUB_TOKEN: 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
       run: |
         # Variables
         GITHUB_API_URL="https://api.github.com"
@@ -32,7 +32,7 @@ jobs:
         PR_TITLE="Automated Pull Request from $SOURCE_BRANCH to $TARGET_BRANCH"
         PR_BODY="This is an automated pull request created by GitHub Actions."
         # Create Pull Request using GitHub API
-        response=$(curl -s -X POST -H "Authorization: token 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" \
+        response=$(curl -s -X POST -H "Authorization: token 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" \
           -H "Accept: application/vnd.github.v3+json" \
           $GITHUB_API_URL/repos/$REPO_OWNER/$REPO_NAME/pulls \
           -d @- << EOF
